@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">weather_forecast</string>
+    <string name="maplocation">Map location</string>
+    <string name="setting">Setting</string>
+    <string name="location">Location</string>
+    <string name="temperature_units">Temperature_units</string>
+    <string name="weather_notifications">Weather Notifications</string>
+</resources>

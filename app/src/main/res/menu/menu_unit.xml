@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/C"
+        android:title="摄氏度"/>
+    <item
+        android:id="@+id/F"
+        android:title="华氏度"/>
+</menu>

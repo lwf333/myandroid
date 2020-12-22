@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="horizontal">
+    <FrameLayout
+        android:id="@+id/menu_large"
+        android:layout_width="500dp"
+        android:layout_height="match_parent">
+    </FrameLayout>
+    <LinearLayout
+        android:layout_width="570dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:background="@color/blue"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+        </LinearLayout>
+        <FrameLayout
+            android:id="@+id/detail_large"
+            android:layout_width="570dp"
+            android:layout_height="match_parent">
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/location_large"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:text="@string/maplocation">
+        </Button>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey">
+        </View>
+        <Button
+            android:id="@+id/setting_large"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:text="@string/setting">
+        </Button>
+    </LinearLayout>
+</LinearLayout>
+
