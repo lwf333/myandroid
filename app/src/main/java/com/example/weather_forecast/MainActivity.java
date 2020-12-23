@@ -1,7 +1,9 @@
 package com.example.weather_forecast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -14,6 +16,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String location;
     private String Temperature_unit;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +64,25 @@ public class MainActivity extends AppCompatActivity {
         //如果是平板
         if (isTwopage){
             Fragment fragment = fm.findFragmentById(R.id.menu_large);
+            mToolbar = (Toolbar)findViewById(R.id.second_toolbar);
+            setSupportActionBar(mToolbar);
+            mToolbar.setTitle("");
+            mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()){
+                        case R.id.menu_setting:
+                            Intent intent = new Intent(MainActivity.this, Setting.class);
+                            startActivity(intent);
+                            break;
+                        case R.id.menu_map:
+                            break;
+                        default:
+                            break;
+                    }
+                    return true;
+                }
+            });
             if (fragment == null){
                 fragment = createFragment2();
                 fm.beginTransaction().add(R.id.menu_large,fragment).commit();
@@ -66,21 +90,6 @@ public class MainActivity extends AppCompatActivity {
                 fragment = createFragment2();
                 fm.beginTransaction().replace(R.id.menu_large, fragment).commit();
             }
-
-            mlocation = (Button)findViewById(R.id.location_large);
-            mlocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
-            msetting = (Button)findViewById(R.id.setting_large);
-            msetting.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainActivity.this, Setting.class);
-                    startActivity(intent);
-                }
-            });
             createFragment2();
         } else{    //如果是手机
             Fragment fragment = fm.findFragmentById(R.id.fragment_container);
@@ -92,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
                 fm.beginTransaction().replace(R.id.fragment_container, fragment).commit();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
     }
 
     protected Fragment createFragment1() {

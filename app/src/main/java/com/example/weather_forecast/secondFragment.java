@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +35,7 @@ public class secondFragment extends Fragment {
     private String mTemperature_unit;
 
     private int lastposition=-1;
+
     public static secondFragment newInstance(String location,String Temperature_unit){
         return new secondFragment(location,Temperature_unit);
     }
@@ -55,6 +61,7 @@ public class secondFragment extends Fragment {
         setupAdapter();
         return v;
     }
+
 
     @Override
     public void onDestroyView() {

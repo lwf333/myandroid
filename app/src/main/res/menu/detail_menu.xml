@@ -13,9 +13,11 @@
         app:showAsAction="ifRoom|withText">
     </item>
     <item
+        android:id="@+id/detail_menu_setting"
         android:title="@string/setting">
     </item>
     <item
+        android:id="@+id/detail_menu_map"
         android:title="@string/maplocation">
     </item>
 </menu>

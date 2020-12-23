@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="280dp"
     android:layout_gravity="top"
-    android:background="@color/blue">
+    android:background="@color/deepblue">
 
     <FrameLayout
         android:layout_width="202dp"
@@ -72,32 +72,9 @@
         android:layout_gravity="right"
         android:orientation="vertical">
         <LinearLayout
-            android:background="@android:color/white"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_gravity="top"
-            android:orientation="vertical">
-            <Button
-                android:background="@android:color/white"
-                android:id="@+id/location"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="@string/maplocation">
-            </Button>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/grey">
-            </View>
-            <Button
-                android:background="@android:color/white"
-                android:id="@+id/setting"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="@string/setting">
-            </Button>
+            android:layout_height="70dp">
         </LinearLayout>
-
         <ImageView
             android:id="@+id/first_image_view"
             android:layout_width="match_parent"

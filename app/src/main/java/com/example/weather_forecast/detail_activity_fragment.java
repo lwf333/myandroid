@@ -101,6 +101,12 @@ public class detail_activity_fragment extends Fragment {
             case R.id.share:
                 showShareDialog();
                 return true;
+            case R.id.detail_menu_setting:
+                Intent intent = new Intent(getActivity(),Setting.class);
+                startActivity(intent);
+                return true;
+            case R.id.detail_menu_map:
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -182,7 +188,7 @@ public class detail_activity_fragment extends Fragment {
                         dialog.dismiss();
                         switch (which){
                             case 0:
-                                sendMail("共享软件");
+                                sendMail("超级无敌天气预报分享");
                                 break;
                             case 1:
                                 sendSMS();
@@ -201,10 +207,25 @@ public class detail_activity_fragment extends Fragment {
 
     private void sendMail(String emailBody){
         Intent email = new Intent(Intent.ACTION_SEND);
-        email.setType("plain/text");
-        String emailSubject = "共享软件";
+        String date = mGalleryItem.getFxDate();
+        String max = mGalleryItem.getTempMax()+"℃";;
+        String min = mGalleryItem.getTempMin()+"℃";
+        String humidity = mGalleryItem.getHumidity()+"%";
+        String pressure = mGalleryItem.getPressure()+"hPa";
+        String windspeed = mGalleryItem.getWindspeedday()+"km/h";
+        String winddir = mGalleryItem.getWinddirday();
 
-        email.putExtra(Intent.EXTRA_EMAIL,"476029289@qq.com");
+        email.setType("plain/text");
+        String emailSubject =
+                "日期："+date+"\n"
+                +"最高温度："+max+"\n"
+                +"最低温度:"+min+"\n"
+                +"空气湿度:"+humidity+"\n"
+                +"大气压:"+pressure+"\n"
+                +"风速:"+windspeed+"\n"
+                +"风向:"+winddir+"\n";
+
+        email.putExtra(Intent.EXTRA_EMAIL,"");
         email.putExtra(Intent.EXTRA_SUBJECT,emailSubject);
         email.putExtra(Intent.EXTRA_TEXT,emailBody);
         startActivityForResult(Intent.createChooser(email,"发邮件的软件"),1001);
@@ -213,8 +234,23 @@ public class detail_activity_fragment extends Fragment {
     private void sendSMS(){
         Uri smsToUri = Uri.parse("smsto:");
         Intent sendIntent = new Intent(Intent.ACTION_VIEW,smsToUri);
-        sendIntent.putExtra("address","17754731082");
-        sendIntent.putExtra("sms_body","？？？");
+        String date = mGalleryItem.getFxDate();
+        String max = mGalleryItem.getTempMax()+"℃";;
+        String min = mGalleryItem.getTempMin()+"℃";
+        String humidity = mGalleryItem.getHumidity()+"%";
+        String pressure = mGalleryItem.getPressure()+"hPa";
+        String windspeed = mGalleryItem.getWindspeedday()+"km/h";
+        String winddir = mGalleryItem.getWinddirday();
+        String smsbody =
+                "日期："+date+"\n"
+                        +"最高温度："+max+"\n"
+                        +"最低温度:"+min+"\n"
+                        +"空气湿度:"+humidity+"\n"
+                        +"大气压:"+pressure+"\n"
+                        +"风速:"+windspeed+"\n"
+                        +"风向:"+winddir+"\n";
+        sendIntent.putExtra("address","");
+        sendIntent.putExtra("sms_body",smsbody);
         sendIntent.setType("vnd.android-dir/mms-sms");
         startActivityForResult(sendIntent,1002);
     }

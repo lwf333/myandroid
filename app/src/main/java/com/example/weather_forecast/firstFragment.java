@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -13,6 +16,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +38,8 @@ public class firstFragment extends Fragment {
 
     private String mlocation;
     private String mTemperature_unit;
+    private Toolbar mToolbar;
+
     //private ThumbnailDownloader<weatherHolder>mThumbnailDownloader;
     public interface  OnRecyclerItemClickListener{
         void onItemClick(int position,List<GalleryItem>galleryItems);
@@ -50,6 +57,7 @@ public class firstFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         new FetchIemsTask().execute();
+        setHasOptionsMenu(true);
         //Handler responseHandler = new Handler();
         //mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
         /*mThumbnailDownloader.setThumbnailDownloadListener(
@@ -72,11 +80,29 @@ public class firstFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_weather_gallery,container,false);
 
+        mToolbar = (Toolbar)v.findViewById(R.id.first_toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
+        getActivity().setTitle("");
+
         mfirstRecyclerView = (RecyclerView) v.findViewById(R.id.weather_recycler_view);
         mfirstRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),1));
 
         setupAdapter();
         return v;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_setting:
+                Intent intent = new Intent(getActivity(), Setting.class);
+                startActivity(intent);
+                return true;
+            case R.id.menu_map:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -216,27 +242,12 @@ public class firstFragment extends Fragment {
                 mItemweatherView = (TextView)itemView.findViewById(R.id.first_weather_view);
                 mItemMaxView = (TextView)itemView.findViewById(R.id.maxtemperature);
                 mItemMinView = (TextView)itemView.findViewById(R.id.mintemperature);
-                mMaplocation = (Button)itemView.findViewById(R.id.location);
-                mSetting = (Button)itemView.findViewById(R.id.setting);
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (mOnItemClickListener!=null){
                             mOnItemClickListener.onItemClick(getAdapterPosition(),mGalleryItems);
                         }
-                    }
-                });
-                mMaplocation.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.i("location","1");
-                    }
-                });
-                mSetting.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(),Setting.class);
-                        startActivity(intent);
                     }
                 });
             }
