@@ -1,12 +1,15 @@
 package com.example.weather_forecast;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +26,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.weather_forecast.DataItem.Data;
+import com.example.weather_forecast.DataItem.Day1;
+import com.example.weather_forecast.DataItem.GalleryItem;
+import com.example.weather_forecast.DateBase.GalleryItemLab;
+import com.example.weather_forecast.DateBase.SQLBaseHelper;
+
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class firstFragment extends Fragment {
@@ -39,6 +47,7 @@ public class firstFragment extends Fragment {
     private String mlocation;
     private String mTemperature_unit;
     private Toolbar mToolbar;
+    private SQLiteDatabase mDatabase;
 
     //private ThumbnailDownloader<weatherHolder>mThumbnailDownloader;
     public interface  OnRecyclerItemClickListener{
@@ -56,7 +65,13 @@ public class firstFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchIemsTask().execute();
+        mDatabase = new SQLBaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
+        if (isConnectIsNomarl()) {
+            new FetchIemsTask().execute();
+        } else {
+            mItems = GalleryItemLab.getmGalleryItems(mlocation,mDatabase);
+            setupAdapter();
+        }
         setHasOptionsMenu(true);
         //Handler responseHandler = new Handler();
         //mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
@@ -73,6 +88,11 @@ public class firstFragment extends Fragment {
         mThumbnailDownloader.getLooper();
 
          */
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Nullable
@@ -99,6 +119,15 @@ public class firstFragment extends Fragment {
                 startActivity(intent);
                 return true;
             case R.id.menu_map:
+                final Data app = (Data) getActivity().getApplication();
+                String encodeName = Uri.encode(app.getNlocation());
+                Uri locationUri = Uri.parse("geo:0,0?q="+encodeName);
+                Intent intent1 = new Intent(Intent.ACTION_VIEW);
+                Intent chooser = Intent.createChooser(intent1,"请选择地图软件");
+                intent1.setData(locationUri);
+                if (intent1.resolveActivity(getActivity().getPackageManager())!=null){
+                    startActivity(chooser);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -125,8 +154,7 @@ public class firstFragment extends Fragment {
             adapter.setOnItemClickListener(new OnRecyclerItemClickListener() {
                 @Override
                 public void onItemClick(int position, List<GalleryItem> galleryItems) {
-                    Intent_GalleryItem intent_galleryItem = new Intent_GalleryItem(galleryItems.get(position));
-                    Intent intent = new Intent(getActivity(),detail_activity.class);
+                    Intent intent = new Intent(getActivity(), detail_activity.class);
                     intent.putExtra(EXTRA_POSITION,position);
                     startActivity(intent);
                 }
@@ -253,6 +281,9 @@ public class firstFragment extends Fragment {
             }
 
             public void bindGalleryItem(GalleryItem galleryItem) throws ParseException {
+                Day1.setIconDay(galleryItem.getIconDay());
+                Day1.setTempMax(galleryItem.getTempMax());
+                Day1.setTextDay(galleryItem.getTextDay());
                 String date = galleryItem.getFxDate();
                 String week = null;
                 week = Time.StringToWeek(date);
@@ -358,7 +389,29 @@ public class firstFragment extends Fragment {
         @Override
         protected void onPostExecute(List<GalleryItem> galleryItems) {
             mItems = galleryItems;
+            String keyid;
+            for (int position=0;position<galleryItems.size();position++){
+                keyid = mlocation+position;
+                String [] whereArgs = {mlocation};
+                if (GalleryItemLab.itemexist(whereArgs,keyid,mDatabase)){
+                    GalleryItemLab.updateGalleryItem(galleryItems.get(position),mlocation,position,mDatabase);
+                } else {
+                    GalleryItemLab.addGalleryItem(galleryItems.get(position),mlocation,position,mDatabase);
+                }
+            }
             setupAdapter();
+        }
+    }
+    private boolean isConnectIsNomarl() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info != null && info.isAvailable()) {
+            String intentName = info.getTypeName();
+            Log.i("通了没！", "当前网络名称：" + intentName);
+            return true;
+        } else {
+            Log.i("通了没！", "没有可用网络");
+            return false;
         }
     }
 }

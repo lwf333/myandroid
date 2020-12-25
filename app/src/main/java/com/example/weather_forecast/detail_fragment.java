@@ -12,9 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.weather_forecast.DataItem.GalleryItem;
+import com.example.weather_forecast.R;
+import com.example.weather_forecast.Time;
+
 import java.lang.reflect.Field;
 import java.text.ParseException;
-import java.util.Collection;
 
 public class detail_fragment extends Fragment {
     detail_fragment(){

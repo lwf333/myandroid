@@ -3,13 +3,15 @@ package com.example.weather_forecast;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.weather_forecast.DataItem.GalleryItem;
+import com.example.weather_forecast.getUrl;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class qweather{
@@ -18,13 +20,12 @@ public class qweather{
     private static final String API_KEY = "15ad925746e7407aa085901c50cb7d5c";
     private String mlocation;
 
-    qweather(String location){
+    public qweather(String location){
         mlocation = location;
     }
 
     public List<GalleryItem>fetchItems(){
         List<GalleryItem>items = new ArrayList<>();
-        Log.i("wea",mlocation);
 
         try{
             String url = Uri.parse("https://devapi.qweather.com/v7/weather/15d?")
@@ -43,7 +44,6 @@ public class qweather{
         }catch (JSONException je){
             Log.e(TAG, "Failed to parse JSON",je);
         }
-        Log.i("qw",items.get(0).getTextDay());
         return items;
     }
     private void parseItems(List<GalleryItem> items, JSONObject jsonBody) throws IOException, JSONException {

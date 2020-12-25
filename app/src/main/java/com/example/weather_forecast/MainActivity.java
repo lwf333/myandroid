@@ -1,27 +1,23 @@
 package com.example.weather_forecast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 
-import java.util.Set;
+import com.example.weather_forecast.DataItem.Data;
+import com.example.weather_forecast.DateBase.CityBaseHelper;
+import com.example.weather_forecast.DateBase.CityItemLab;
 
 public class MainActivity extends AppCompatActivity {
     private static final String key = "com.example.weather_forecast.MainActivity";
@@ -33,22 +29,32 @@ public class MainActivity extends AppCompatActivity {
     private String location;
     private String Temperature_unit;
     private Toolbar mToolbar;
+    private SQLiteDatabase mDatabase;
+
+    private static final String STRATCITY = "北京";
+    private static final String STRATLOCATION = "101010100";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Data app = (Data)getApplication();
-        app.setLocation("101010100");
-        app.setNlocation("BeiJing");
-        app.setTemperature_unit("C");
+        mDatabase = new CityBaseHelper(getApplicationContext()).getWritableDatabase();
+
+        if (!CityItemLab.cityexist(new String[]{STRATCITY},STRATCITY,mDatabase)){
+            CityItemLab.addcityItem(STRATLOCATION,STRATCITY,mDatabase);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         final Data app = (Data)getApplication();
+        if(app.getLocation().equals("")){
+            app.setLocation(STRATLOCATION);
+            app.setNlocation(STRATCITY);
+            app.setTemperature_unit("C");
+        }
         location=app.getLocation();
         Temperature_unit = app.getTemperature_unit();
         AutoReceiver.setServiceAlarm(this, app.isNotification());
@@ -76,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
                             break;
                         case R.id.menu_map:
+                            String encodeName = Uri.encode(app.getNlocation());
+                            Uri locationUri = Uri.parse("geo:0,0?q="+encodeName);
+                            Intent intent1 = new Intent(Intent.ACTION_VIEW);
+                            Intent chooser = Intent.createChooser(intent1,"请选择地图软件");
+                            intent1.setData(locationUri);
+                            if (intent1.resolveActivity(getPackageManager())!=null){
+                                startActivity(chooser);
+                            }
                             break;
                         default:
                             break;

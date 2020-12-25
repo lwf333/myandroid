@@ -1,13 +1,14 @@
 package com.example.weather_forecast;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,16 +16,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weather_forecast.DataItem.Day1;
+import com.example.weather_forecast.DataItem.GalleryItem;
+import com.example.weather_forecast.DateBase.GalleryItemLab;
+import com.example.weather_forecast.DateBase.SQLBaseHelper;
+
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class secondFragment extends Fragment {
@@ -33,6 +36,7 @@ public class secondFragment extends Fragment {
     private List<GalleryItem> mItems = new ArrayList<>();
     private String mlocation;
     private String mTemperature_unit;
+    private SQLiteDatabase mDatabase;
 
     private int lastposition=-1;
 
@@ -47,7 +51,17 @@ public class secondFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new secondFragment.FetchIemsTask().execute();
+        mDatabase = new SQLBaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
+        if (isConnectIsNomarl()) {
+            new FetchIemsTask().execute();
+        } else {
+            mItems = GalleryItemLab.getmGalleryItems(mlocation,mDatabase);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Nullable
@@ -125,6 +139,11 @@ public class secondFragment extends Fragment {
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
             GalleryItem galleryItem = mGalleryItems.get(position);
+            if (position==0){
+                Day1.setIconDay(galleryItem.getIconDay());
+                Day1.setTempMax(galleryItem.getTempMax());
+                Day1.setTextDay(galleryItem.getTextDay());
+            }
             String Icon = galleryItem.getIconDay();
             String name = "s1"+Icon;
             Class drawable = R.drawable.class;
@@ -220,7 +239,30 @@ public class secondFragment extends Fragment {
         @Override
         protected void onPostExecute(List<GalleryItem> galleryItems) {
             mItems = galleryItems;
+            String keyid;
+            for (int position=0;position<galleryItems.size();position++){
+                keyid = mlocation+position;
+                String [] whereArgs = {mlocation};
+                if (GalleryItemLab.itemexist(whereArgs,keyid,mDatabase)){
+                    GalleryItemLab.updateGalleryItem(galleryItems.get(position),mlocation,position,mDatabase);
+                } else {
+                    GalleryItemLab.addGalleryItem(galleryItems.get(position),mlocation,position,mDatabase);
+                }
+            }
             setupAdapter();
+        }
+    }
+
+    private boolean isConnectIsNomarl() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info != null && info.isAvailable()) {
+            String intentName = info.getTypeName();
+            Log.i("通了没！", "当前网络名称：" + intentName);
+            return true;
+        } else {
+            Log.i("通了没！", "没有可用网络");
+            return false;
         }
     }
 }

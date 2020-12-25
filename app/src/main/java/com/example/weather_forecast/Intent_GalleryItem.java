@@ -3,7 +3,7 @@ package com.example.weather_forecast;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Collection;
+import com.example.weather_forecast.DataItem.GalleryItem;
 
 public class Intent_GalleryItem implements Parcelable {
     public Intent_GalleryItem(GalleryItem galleryItem){

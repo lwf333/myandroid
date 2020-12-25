@@ -1,4 +1,4 @@
-package com.example.weather_forecast;
+package com.example.weather_forecast.DataItem;
 
 public class day1Item {
     private String Icon;

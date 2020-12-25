@@ -3,6 +3,8 @@ package com.example.weather_forecast;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.weather_forecast.getUrl;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +21,7 @@ public class qcity {
     private static final String API_KEY = "15ad925746e7407aa085901c50cb7d5c";
     private String nlocation;
 
-    qcity(String location){
+    public qcity(String location){
         nlocation = location;
     }
 

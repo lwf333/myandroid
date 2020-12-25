@@ -1,8 +1,12 @@
 package com.example.weather_forecast;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +30,11 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.weather_forecast.DataItem.Data;
+import com.example.weather_forecast.DataItem.GalleryItem;
+import com.example.weather_forecast.DateBase.GalleryItemLab;
+import com.example.weather_forecast.DateBase.SQLBaseHelper;
+
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,6 +42,8 @@ import java.util.List;
 
 public class detail_activity_fragment extends Fragment {
     private static final String EXTRA_POSITION = "com.example.weather_forecast.position";
+
+    private SQLiteDatabase mDatebase;
 
     private List<GalleryItem> mItems = new ArrayList<>();
     private GalleryItem mGalleryItem;
@@ -46,17 +57,18 @@ public class detail_activity_fragment extends Fragment {
     private TextView mwind;
     private ImageView mImageView;
     private String mlocation;
-    private int position;
+    private int mposition;
     private Toolbar mToolbar;
     String mTemperature_unit;
 
-    public static detail_activity_fragment newInstance(String location,String Temperature_unit){
-        return new detail_activity_fragment(location, Temperature_unit);
+    public static detail_activity_fragment newInstance(String location,String Temperature_unit,int position){
+        return new detail_activity_fragment(location, Temperature_unit,position);
     }
 
-    detail_activity_fragment(String location,String Temperature_unit){
+    detail_activity_fragment(String location,String Temperature_unit,int position){
         mlocation = location;
         mTemperature_unit = Temperature_unit;
+        mposition = position;
     }
 
 
@@ -85,7 +97,15 @@ public class detail_activity_fragment extends Fragment {
         mpressure = (TextView)view.findViewById(R.id.detail_pressure);
         mwind = (TextView)view.findViewById(R.id.detail_wind);
         mImageView = (ImageView) view.findViewById(R.id.detail_image);
-        new FetchdetailTask().execute();
+        if (isConnectIsNomarl()) {
+            new FetchdetailTask().execute();
+        } else {
+            mDatebase = new SQLBaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
+            List<GalleryItem> galleryItems;
+            galleryItems = GalleryItemLab.getmGalleryItems(mlocation,mDatebase);
+            mGalleryItem = galleryItems.get(mposition);
+            postview();
+        }
         return view;
     }
 
@@ -102,10 +122,19 @@ public class detail_activity_fragment extends Fragment {
                 showShareDialog();
                 return true;
             case R.id.detail_menu_setting:
-                Intent intent = new Intent(getActivity(),Setting.class);
+                Intent intent = new Intent(getActivity(), Setting.class);
                 startActivity(intent);
                 return true;
             case R.id.detail_menu_map:
+                final Data app = (Data) getActivity().getApplication();
+                String encodeName = Uri.encode(app.getNlocation());
+                Uri locationUri = Uri.parse("geo:0,0?q="+encodeName);
+                Intent intent1 = new Intent(Intent.ACTION_VIEW);
+                Intent chooser = Intent.createChooser(intent1,"请选择地图软件");
+                intent1.setData(locationUri);
+                if (intent1.resolveActivity(getActivity().getPackageManager())!=null){
+                    startActivity(chooser);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -119,7 +148,7 @@ public class detail_activity_fragment extends Fragment {
         }
         @Override
         protected void onPostExecute(List<GalleryItem> galleryItems) {
-            mGalleryItem =galleryItems.get(position);
+            mGalleryItem =galleryItems.get(mposition);
             postview();
         }
     }
@@ -253,5 +282,18 @@ public class detail_activity_fragment extends Fragment {
         sendIntent.putExtra("sms_body",smsbody);
         sendIntent.setType("vnd.android-dir/mms-sms");
         startActivityForResult(sendIntent,1002);
+    }
+
+    private boolean isConnectIsNomarl() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info != null && info.isAvailable()) {
+            String intentName = info.getTypeName();
+            Log.i("通了没！", "当前网络名称：" + intentName);
+            return true;
+        } else {
+            Log.i("通了没！", "没有可用网络");
+            return false;
+        }
     }
 }

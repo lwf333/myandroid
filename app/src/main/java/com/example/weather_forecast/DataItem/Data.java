@@ -1,4 +1,4 @@
-package com.example.weather_forecast;
+package com.example.weather_forecast.DataItem;
 
 import android.app.Application;
 

@@ -3,7 +3,9 @@ package com.example.weather_forecast;
 import android.net.Uri;
 import android.util.Log;
 
-import org.json.JSONArray;
+import com.example.weather_forecast.DataItem.day1Item;
+import com.example.weather_forecast.getUrl;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,7 +15,7 @@ public class qAuto {
     private static final String TAG = "qAuto";
     private static final String API_KEY = "15ad925746e7407aa085901c50cb7d5c";
     private String nlocation;
-    qAuto(String location){
+    public qAuto(String location){
         nlocation = location;
     }
 
